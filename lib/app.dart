@@ -10,15 +10,14 @@ class App extends StatelessWidget {
       );
 
   ThemeData _createTheme() => ThemeData(
-    //primarySwatch: Colors.red,
+    primarySwatch: Colors.red,
     primaryColor: Colors.amber,
     accentColor: Colors.blue,
-    scaffoldBackgroundColor: Colors.orange.shade200,
+    scaffoldBackgroundColor: Colors.yellow.shade200,
     elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          primary: Colors.orange,
-          minimumSize: Size(100, 50),
-          shape: StadiumBorder(),
+          primary: Colors.blueGrey,
+          minimumSize: Size(200, 50),
         )
     ),
     textButtonTheme: TextButtonThemeData(

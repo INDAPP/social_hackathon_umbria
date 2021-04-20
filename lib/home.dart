@@ -59,7 +59,7 @@ class _HomeState extends State<Home> {
       );
 
   Widget _buildBody(BuildContext context) => Align(
-        alignment: Alignment.lerp(Alignment.topCenter, Alignment.center, 0.25),
+        alignment: Alignment.lerp(Alignment.topCenter, Alignment.center, 0.25)!,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -162,12 +162,14 @@ class _HomeState extends State<Home> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(
+            TextFormField(
+              validator: _validateEmail,
               decoration: InputDecoration(
                 labelText: "email",
               ),
             ),
-            TextField(
+            TextFormField(
+              validator: _validatePassword,
               decoration: InputDecoration(
                 labelText: "password",
               ),
@@ -177,18 +179,33 @@ class _HomeState extends State<Home> {
       );
 
   Widget _buildActions(BuildContext context) => Container(
-    padding: EdgeInsets.only(top: 16),
+        padding: EdgeInsets.only(top: 16),
         child: Column(
           children: [
             ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  //TODO
-                });
-              },
+              onPressed: _login,
               child: Text("Login"),
             ),
           ],
         ),
       );
+
+  String? _validateEmail([String? email]) {
+    if (email?.contains("@") == true)
+      return null;
+    else
+      return "Inserire un'email valida";
+  }
+
+  String? _validatePassword([String? password]) {
+    final length = password?.length ?? 0;
+    if (length > 6)
+      return null;
+    else
+      return "Inserire almeno 6 acratteri";
+  }
+
+  void _login() {
+    //TODO: eseguire il login
+  }
 }
