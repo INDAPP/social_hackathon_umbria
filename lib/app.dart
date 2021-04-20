@@ -13,18 +13,18 @@ class App extends StatelessWidget {
     primarySwatch: Colors.red,
     primaryColor: Colors.amber,
     accentColor: Colors.blue,
-    scaffoldBackgroundColor: Colors.yellow.shade200,
+    scaffoldBackgroundColor: Color(0xffdfe0e1),
     elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          primary: Colors.blueGrey,
+          primary: Color(0xff00b6ca),
           minimumSize: Size(200, 50),
         )
     ),
     textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          primary: Colors.green,
+          primary: Color(0xff00b6ca),
           textStyle: TextStyle(
-            fontSize: 30,
+            fontSize: 15,
             fontWeight: FontWeight.w900,
           ),
         )
@@ -38,8 +38,9 @@ class App extends StatelessWidget {
         fontSize: 24,
       ),
       headline4: TextStyle(
-        fontSize: 32,
+        fontSize: 36,
         fontWeight: FontWeight.w700,
+        color: Color(0xfff4a045),
       ),
     ),
   );

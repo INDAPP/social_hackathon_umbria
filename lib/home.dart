@@ -155,7 +155,15 @@ class _HomeState extends State<Home> {
       );
 
   Widget _buildLogo(BuildContext context) => Container(
-      //TODO:
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "Social Hackathon",
+              style: Theme.of(context).textTheme.headline4,
+            ),
+          ],
+        ),
       );
 
   Widget _buildForm(BuildContext context) => Container(
@@ -186,6 +194,11 @@ class _HomeState extends State<Home> {
               onPressed: _login,
               child: Text("Login"),
             ),
+            SizedBox(height: 8),
+            TextButton(
+              onPressed: _signup,
+              child: Text("Signup"),
+            ),
           ],
         ),
       );
@@ -208,4 +221,6 @@ class _HomeState extends State<Home> {
   void _login() {
     //TODO: eseguire il login
   }
+
+  void _signup() {}
 }
