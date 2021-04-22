@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_hackathon_umbria/signup.dart';
 
 const String myUsername = "Riccardo";
 const String myPassword = "123456";
@@ -11,16 +12,16 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  String textFieldString = "";
-  String textFieldPassword = "";
+  GlobalKey<FormState> _formKey = GlobalKey();
 
-  bool loginSuccess = false;
+  String? _email;
+  String? _password;
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        body: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
+        body: Center(
           child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
             child: Column(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -42,7 +43,7 @@ class _HomeState extends State<Home> {
             SizedBox(height: 16),
             Image.asset(
               "images/shu_logo.png",
-              height: 180,
+              height: 120,
             ),
             SizedBox(height: 16),
             Text(
@@ -55,22 +56,32 @@ class _HomeState extends State<Home> {
       );
 
   Widget _buildForm(BuildContext context) => Container(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextFormField(
-              validator: _validateEmail,
-              decoration: InputDecoration(
-                labelText: "email",
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                validator: _validateEmail,
+                onSaved: (value) {
+                  _email = value;
+                },
+                decoration: InputDecoration(
+                  labelText: "email",
+                ),
               ),
-            ),
-            TextFormField(
-              validator: _validatePassword,
-              decoration: InputDecoration(
-                labelText: "password",
+              TextFormField(
+                validator: _validatePassword,
+                onSaved: (value) {
+                  _password = value;
+                },
+                decoration: InputDecoration(
+                  labelText: "password",
+                ),
+                obscureText: true,
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
 
@@ -103,12 +114,26 @@ class _HomeState extends State<Home> {
     if (length > 6)
       return null;
     else
-      return "Inserire almeno 6 acratteri";
+      return "Inserire almeno 6 caratteri";
   }
 
   void _login() {
-    //TODO: eseguire il login
+    final validated = _formKey.currentState?.validate() ?? false;
+    if (validated) {
+      _formKey.currentState?.save();
+
+      final email = _email;
+      final password = _password;
+
+      print(email);
+      print(password);
+      //TODO: eseguire il login
+    }
   }
 
-  void _signup() {}
+  void _signup() {
+    showDialog(context: context, builder: _buildSignupDialog);
+  }
+
+  Widget _buildSignupDialog(BuildContext context) => Signup();
 }

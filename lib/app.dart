@@ -18,6 +18,7 @@ class App extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           primary: Color(0xff00b6ca),
           minimumSize: Size(200, 50),
+          shape: StadiumBorder(),
         )
     ),
     textButtonTheme: TextButtonThemeData(
