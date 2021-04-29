@@ -31,6 +31,7 @@ class _SignupState extends State<Signup> {
   Widget _buildContent(BuildContext context) {
     return Container(
       child: Form(
+        key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -80,7 +81,7 @@ class _SignupState extends State<Signup> {
 
   String? _validateName([String? name]) {
     final length = name?.length ?? 0;
-    if (length > 3)
+    if (length >= 3)
       return null;
     else
       return "Inserire almeno 3 caratteri";
@@ -95,7 +96,7 @@ class _SignupState extends State<Signup> {
 
   String? _validatePassword([String? password]) {
     final length = password?.length ?? 0;
-    if (length > 6)
+    if (length >= 6)
       return null;
     else
       return "Inserire almeno 6 caratteri";
@@ -109,7 +110,7 @@ class _SignupState extends State<Signup> {
   }
 
   void _dismiss() {
-    //TODO
+    Navigator.of(context).pop();
   }
 
   void _signup() {
@@ -123,7 +124,8 @@ class _SignupState extends State<Signup> {
       print(name);
       print(email);
       print(password);
-      //TODO: eseguire il login
+
+      Navigator.of(context).pop();
     }
   }
 }
