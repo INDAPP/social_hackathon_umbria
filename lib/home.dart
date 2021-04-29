@@ -67,7 +67,7 @@ class _HomeState extends State<Home> {
                   _email = value;
                 },
                 decoration: InputDecoration(
-                  labelText: "email",
+                  labelText: "Email",
                 ),
               ),
               TextFormField(
@@ -76,7 +76,7 @@ class _HomeState extends State<Home> {
                   _password = value;
                 },
                 decoration: InputDecoration(
-                  labelText: "password",
+                  labelText: "Password",
                 ),
                 obscureText: true,
               ),
