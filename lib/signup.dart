@@ -1,6 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:social_hackathon_umbria/model_signup.dart';
 
 class Signup extends StatefulWidget {
+  final String? email;
+  final String? password;
+
+  const Signup({
+    Key? key,
+    this.email,
+    this.password,
+  }) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => _SignupState();
 }
@@ -45,6 +55,7 @@ class _SignupState extends State<Signup> {
               ),
             ),
             TextFormField(
+              initialValue: widget.email,
               validator: _validateEmail,
               onSaved: (value) {
                 _email = value;
@@ -54,6 +65,7 @@ class _SignupState extends State<Signup> {
               ),
             ),
             TextFormField(
+              initialValue: widget.password,
               validator: _validatePassword,
               onSaved: (value) {
                 _password = value;
@@ -121,11 +133,13 @@ class _SignupState extends State<Signup> {
       final email = _email;
       final password = _password;
 
-      print(name);
-      print(email);
-      print(password);
+      final modelSignup = ModelSignup(
+        name: name!,
+        email: email!,
+        password: password!,
+      );
 
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(modelSignup);
     }
   }
 }
