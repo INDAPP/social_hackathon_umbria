@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:social_hackathon_umbria/home.dart';
 import 'package:social_hackathon_umbria/login.dart';
 
 class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MaterialApp(
         title: "Social Hackathon",
-        home: Login(),
+        //home: Login(), //TODO: ri-attivare
+        home: Home(),
         theme: _createTheme(),
       );
 
@@ -33,10 +35,10 @@ class App extends StatelessWidget {
     textTheme: TextTheme(
       bodyText1: TextStyle(
         fontSize: 20,
-        color: Colors.red.shade800,
+        fontWeight: FontWeight.bold,
       ),
       bodyText2: TextStyle(
-        fontSize: 24,
+        fontSize: 18,
       ),
       headline4: TextStyle(
         fontSize: 36,
