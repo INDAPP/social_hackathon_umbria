@@ -87,7 +87,6 @@ class _LoginState extends State<Login> {
                 ),
                 obscureText: true,
               ),
-
             ],
           ),
         ),
@@ -147,21 +146,28 @@ class _LoginState extends State<Login> {
     }
   }
 
-  void _signup() {
-    final future = showDialog<ModelSignup>(context: context, builder: _buildSignupDialog);
+  void _signup() async {
+    final future = showDialog<ModelSignup>(
+      context: context,
+      builder: _buildSignupDialog,
+    );
 
-    future.then((value) {
-      print("Valore restituito: $value");
-      if (value != null) {
-        //TODO: eseguire la registrazione
-      }
-    });
+    final modelSignup = await future;
+
+    _onSignup(modelSignup);
+  }
+
+  void _onSignup(ModelSignup? modelSignup) {
+    print("Valore restituito: $modelSignup");
+    if (modelSignup != null) {
+      //TODO: eseguire la registrazione
+    }
   }
 
   Widget _buildSignupDialog(BuildContext context) => Signup(
-    email: _emailController.text,
-    password: _passwordController.text,
-  );
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
 
   Widget _buildHomePage(BuildContext context) => Home();
 }

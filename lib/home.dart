@@ -23,6 +23,7 @@ class Home extends StatelessWidget {
   Widget _buildPostCard(BuildContext context, int index) {
     final post = _mockPosts[index];
     return Padding(
+      key: Key(post.id),
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Card(
         shape: RoundedRectangleBorder(

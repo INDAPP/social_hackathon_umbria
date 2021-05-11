@@ -6,8 +6,8 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MaterialApp(
         title: "Social Hackathon",
-        //home: Login(), //TODO: ri-attivare
-        home: Home(),
+        home: Login(),
+        //home: Home(),
         theme: _createTheme(),
       );
 
