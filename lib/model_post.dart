@@ -6,7 +6,7 @@ class ModelPost {
   final String authorId;
   final String? content;
   final String? imageUrl;
-  final User? user;
+  final ModelUser? user;
 
   const ModelPost({
     required this.id,

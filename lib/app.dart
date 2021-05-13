@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social_hackathon_umbria/home.dart';
 import 'package:social_hackathon_umbria/login.dart';
@@ -6,8 +7,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MaterialApp(
         title: "Social Hackathon",
-        home: Login(),
-        //home: Home(),
+        home: FirebaseAuth.instance.currentUser != null ? Home() : Login(),
         theme: _createTheme(),
       );
 

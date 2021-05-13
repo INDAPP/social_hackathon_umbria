@@ -1,10 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social_hackathon_umbria/home.dart';
 import 'package:social_hackathon_umbria/model_signup.dart';
 import 'package:social_hackathon_umbria/signup.dart';
-
-const String myEmail = "riccardo@luckyseven.it";
-const String myPassword = "123456";
 
 class Login extends StatefulWidget {
   @override
@@ -132,16 +130,20 @@ class _LoginState extends State<Login> {
       final email = _email;
       final password = _password;
 
-      print(email);
-      print(password);
-      //TODO: eseguire il login
+      if (email != null && password != null) {
+        final future = FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
 
-      if (email == myEmail && password == myPassword) {
-        //TODO: andare alla home
+        // try {
+        //   final credentials = await future;
+        //   _onLoginSuccess(credentials);
+        // } catch (e) {
+        //   _onLoginError(e);
+        // }
 
-        final navigator = Navigator.of(context);
-        final route = MaterialPageRoute(builder: _buildHomePage);
-        navigator.pushReplacement(route);
+        future.then(_onLoginSuccess).catchError(_onLoginError);
       }
     }
   }
@@ -161,6 +163,25 @@ class _LoginState extends State<Login> {
     print("Valore restituito: $modelSignup");
     if (modelSignup != null) {
       //TODO: eseguire la registrazione
+    }
+  }
+
+  void _onLoginSuccess(UserCredential userCredential) {
+    final navigator = Navigator.of(context);
+    final route = MaterialPageRoute(builder: _buildHomePage);
+    navigator.pushReplacement(route);
+  }
+
+  void _onLoginError(dynamic error) {
+    print(error);
+    if (error is FirebaseAuthException) {
+      final message = error.message;
+
+      final snackBar = SnackBar(
+        content: Text(message ?? "An error occoured"),
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
 

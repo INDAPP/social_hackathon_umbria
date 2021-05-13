@@ -1,9 +1,9 @@
-class User {
+class ModelUser {
   final String id;
   final String nickname;
   final String? imageUrl;
 
-  User({
+  ModelUser({
     required this.id,
     required this.nickname,
     this.imageUrl,

@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:social_hackathon_umbria/login.dart';
 import 'package:social_hackathon_umbria/model_post.dart';
 import 'package:social_hackathon_umbria/model_user.dart';
 
@@ -8,10 +10,18 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: Text("Home"),
-        ),
+        appBar: _buildAppBar(context),
         body: _buildBody(context),
+      );
+
+  PreferredSizeWidget _buildAppBar(BuildContext context) => AppBar(
+        title: Text("Home"),
+        actions: [
+          TextButton(
+            onPressed: () => _logout(context),
+            child: Text("Logout"),
+          ),
+        ],
       );
 
   Widget _buildBody(BuildContext context) => ListView.builder(
@@ -79,6 +89,17 @@ class Home extends StatelessWidget {
       ),
     );
   }
+
+  void _logout(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+
+    final navigator = Navigator.of(context);
+    final route = MaterialPageRoute(
+      builder: (context) => Login(),
+    );
+    navigator.pushReplacement(route);
+  }
+
 }
 
 List<ModelPost> _mockPosts = [
@@ -88,7 +109,7 @@ List<ModelPost> _mockPosts = [
     authorId: "ksdvbvbws",
     content:
         "Primo post dell'Hackathon Primo post dell'Hackathon Primo post dell'Hackathon Primo post dell'Hackathon",
-    user: User(
+    user: ModelUser(
       id: "0001",
       nickname: "Riccardo",
       imageUrl:
@@ -100,7 +121,7 @@ List<ModelPost> _mockPosts = [
     date: DateTime(2021),
     authorId: "ksdvbvbws",
     content: "Viva il Social Hackathon",
-    user: User(
+    user: ModelUser(
       id: "0001",
       nickname: "Riccardo",
       imageUrl:
