@@ -5,6 +5,11 @@ import 'package:social_hackathon_umbria/login.dart';
 import 'package:social_hackathon_umbria/model_post.dart';
 import 'package:social_hackathon_umbria/model_user.dart';
 
+enum MenuItemAction {
+  logout,
+  settings,
+}
+
 class Home extends StatelessWidget {
   final DateFormat _dateFormat = DateFormat.Hm().add_yMMMEd();
 
@@ -17,12 +22,28 @@ class Home extends StatelessWidget {
   PreferredSizeWidget _buildAppBar(BuildContext context) => AppBar(
         title: Text("Home"),
         actions: [
-          TextButton(
-            onPressed: () => _logout(context),
-            child: Text("Logout"),
+          // TextButton(
+          //   onPressed: () => _logout(context),
+          //   child: Text("Logout"),
+          // ),
+          PopupMenuButton<MenuItemAction>(
+            itemBuilder: _buildMenu,
+            child: Icon(Icons.more_vert),
+            onSelected: (action) => _onMenuAction(context, action),
           ),
         ],
       );
+
+  List<PopupMenuEntry<MenuItemAction>> _buildMenu(BuildContext context) => [
+        PopupMenuItem(
+          value: MenuItemAction.settings,
+          child: Text("Settings"),
+        ),
+        PopupMenuItem(
+          value: MenuItemAction.logout,
+          child: Text("Logout"),
+        ),
+      ];
 
   Widget _buildBody(BuildContext context) => ListView.builder(
         padding: const EdgeInsets.all(16),
@@ -90,6 +111,17 @@ class Home extends StatelessWidget {
     );
   }
 
+  void _onMenuAction(BuildContext context, MenuItemAction action) {
+    switch (action) {
+      case MenuItemAction.settings:
+        //TODO
+        break;
+      case MenuItemAction.logout:
+        _logout(context);
+        break;
+    }
+  }
+
   void _logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
 
@@ -99,7 +131,6 @@ class Home extends StatelessWidget {
     );
     navigator.pushReplacement(route);
   }
-
 }
 
 List<ModelPost> _mockPosts = [
