@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -12,14 +13,19 @@ enum MenuItemAction {
 
 class Home extends StatelessWidget {
   final DateFormat _dateFormat = DateFormat.Hm().add_yMMMEd();
+  final collection = FirebaseFirestore.instance.collection("posts");
+
+
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) =>
+      Scaffold(
         appBar: _buildAppBar(context),
         body: _buildBody(context),
       );
 
-  PreferredSizeWidget _buildAppBar(BuildContext context) => AppBar(
+  PreferredSizeWidget _buildAppBar(BuildContext context) =>
+      AppBar(
         title: Text("Home"),
         actions: [
           // TextButton(
@@ -28,13 +34,14 @@ class Home extends StatelessWidget {
           // ),
           PopupMenuButton<MenuItemAction>(
             itemBuilder: _buildMenu,
-            child: Icon(Icons.more_vert),
+            icon: Icon(Icons.more_vert),
             onSelected: (action) => _onMenuAction(context, action),
           ),
         ],
       );
 
-  List<PopupMenuEntry<MenuItemAction>> _buildMenu(BuildContext context) => [
+  List<PopupMenuEntry<MenuItemAction>> _buildMenu(BuildContext context) =>
+      [
         PopupMenuItem(
           value: MenuItemAction.settings,
           child: Text("Settings"),
@@ -45,14 +52,30 @@ class Home extends StatelessWidget {
         ),
       ];
 
-  Widget _buildBody(BuildContext context) => ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: _mockPosts.length,
-        itemBuilder: _buildPostCard,
-      );
+  Widget _buildBody(BuildContext context) => FutureBuilder<QuerySnapshot>(
+    future: collection.get(),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      } else {
+        return ListView.builder(
+          itemCount: snapshot.data?.size ?? 0,
+          itemBuilder: (context, index) => Card(
+            child: Text("POST"),
+          ),
+        );
+      }
+    },
+  );
+      // ListView.builder(
+      //   padding: const EdgeInsets.all(16),
+      //   //TODO itemCount: _mockPosts.length,
+      //   itemBuilder: _buildPostCard,
+      // );
 
-  Widget _buildPostCard(BuildContext context, int index) {
-    final post = _mockPosts[index];
+  Widget _buildPostCard(BuildContext context, ModelPost post) {
     return Padding(
       key: Key(post.id),
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -74,17 +97,22 @@ class Home extends StatelessWidget {
                       width: 56,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Theme.of(context).unselectedWidgetColor,
+                        color: Theme
+                            .of(context)
+                            .unselectedWidgetColor,
                         image: DecorationImage(
-                          image: NetworkImage(post.user?.imageUrl ?? ""),
+                          image: NetworkImage(post.authorImageUrl ?? ""),
                         ),
                       ),
                       //child: Image.network(post.user?.imageUrl ?? ""),
                     ),
                     SizedBox(width: 16),
                     Text(
-                      post.user?.nickname ?? "Utente Anonimo",
-                      style: Theme.of(context).textTheme.bodyText1,
+                      post.authorName ?? "Utente Anonimo",
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .bodyText1,
                     ),
                   ],
                 ),
@@ -93,7 +121,10 @@ class Home extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
                   post.content!,
-                  style: Theme.of(context).textTheme.bodyText2,
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .bodyText2,
                 ),
               ),
               Padding(
@@ -101,7 +132,10 @@ class Home extends StatelessWidget {
                 child: Text(
                   _dateFormat.format(post.date),
                   textAlign: TextAlign.end,
-                  style: Theme.of(context).textTheme.caption,
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .caption,
                 ),
               ),
             ],
@@ -114,7 +148,7 @@ class Home extends StatelessWidget {
   void _onMenuAction(BuildContext context, MenuItemAction action) {
     switch (action) {
       case MenuItemAction.settings:
-        //TODO
+      //TODO
         break;
       case MenuItemAction.logout:
         _logout(context);
@@ -123,6 +157,11 @@ class Home extends StatelessWidget {
   }
 
   void _logout(BuildContext context) async {
+    final confirm = await showDialog<bool>(
+      context: context, builder: _buildLogoutDialog,);
+
+    if (confirm != true) return;
+
     await FirebaseAuth.instance.signOut();
 
     final navigator = Navigator.of(context);
@@ -131,32 +170,19 @@ class Home extends StatelessWidget {
     );
     navigator.pushReplacement(route);
   }
-}
 
-List<ModelPost> _mockPosts = [
-  ModelPost(
-    id: "skdvbsfkv",
-    date: DateTime(2020),
-    authorId: "ksdvbvbws",
-    content:
-        "Primo post dell'Hackathon Primo post dell'Hackathon Primo post dell'Hackathon Primo post dell'Hackathon",
-    user: ModelUser(
-      id: "0001",
-      nickname: "Riccardo",
-      imageUrl:
-          "https://scontent-mxp1-1.xx.fbcdn.net/v/t1.18169-1/p160x160/21106770_10213796302570902_9084681745243619287_n.jpg?_nc_cat=106&ccb=1-3&_nc_sid=dbb9e7&_nc_ohc=1qQmacXwVHIAX9JqN_r&_nc_ht=scontent-mxp1-1.xx&tp=6&oh=3a7282aedfe65ec722eef1f1b9a77b17&oe=60BADC9D",
-    ),
-  ),
-  ModelPost(
-    id: "skdvbsfte",
-    date: DateTime(2021),
-    authorId: "ksdvbvbws",
-    content: "Viva il Social Hackathon",
-    user: ModelUser(
-      id: "0001",
-      nickname: "Riccardo",
-      imageUrl:
-          "https://scontent-mxp1-1.xx.fbcdn.net/v/t1.18169-1/p160x160/21106770_10213796302570902_9084681745243619287_n.jpg?_nc_cat=106&ccb=1-3&_nc_sid=dbb9e7&_nc_ohc=1qQmacXwVHIAX9JqN_r&_nc_ht=scontent-mxp1-1.xx&tp=6&oh=3a7282aedfe65ec722eef1f1b9a77b17&oe=60BADC9D",
-    ),
-  ),
-];
+  Widget _buildLogoutDialog(BuildContext context) => AlertDialog(
+    title: Text("Logout"),
+    content: Text("Are you sure?"),
+    actions: [
+      TextButton(
+        child: Text("Cancel"),
+        onPressed: () => Navigator.of(context).pop(false),
+      ),
+      TextButton(
+        child: Text("Logout"),
+        onPressed: () => Navigator.of(context).pop(true),
+      ),
+    ],
+  );
+}
