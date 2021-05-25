@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:social_hackathon_umbria/login.dart';
 import 'package:social_hackathon_umbria/model_post.dart';
-import 'package:social_hackathon_umbria/model_user.dart';
 
 enum MenuItemAction {
   logout,
@@ -15,23 +14,22 @@ class Home extends StatelessWidget {
   final DateFormat _dateFormat = DateFormat.Hm().add_yMMMEd();
   final collection = FirebaseFirestore.instance.collection("posts");
 
-
-
   @override
-  Widget build(BuildContext context) =>
-      Scaffold(
+  Widget build(BuildContext context) => Scaffold(
         appBar: _buildAppBar(context),
-        body: _buildBody(context),
+        body: StreamBuilder<QuerySnapshot>(
+          stream: collection.snapshots(),
+          builder: _buildBody,
+        ),
+        floatingActionButton: _buildFab(context),
       );
 
-  PreferredSizeWidget _buildAppBar(BuildContext context) =>
-      AppBar(
-        title: Text("Home"),
+  PreferredSizeWidget _buildAppBar(BuildContext context) => AppBar(
+        title: Image.asset(
+          "images/shu_logo_2021.png",
+          height: 40,
+        ),
         actions: [
-          // TextButton(
-          //   onPressed: () => _logout(context),
-          //   child: Text("Logout"),
-          // ),
           PopupMenuButton<MenuItemAction>(
             itemBuilder: _buildMenu,
             icon: Icon(Icons.more_vert),
@@ -40,8 +38,7 @@ class Home extends StatelessWidget {
         ],
       );
 
-  List<PopupMenuEntry<MenuItemAction>> _buildMenu(BuildContext context) =>
-      [
+  List<PopupMenuEntry<MenuItemAction>> _buildMenu(BuildContext context) => [
         PopupMenuItem(
           value: MenuItemAction.settings,
           child: Text("Settings"),
@@ -52,28 +49,49 @@ class Home extends StatelessWidget {
         ),
       ];
 
-  Widget _buildBody(BuildContext context) => FutureBuilder<QuerySnapshot>(
-    future: collection.get(),
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return Center(
-          child: CircularProgressIndicator(),
+  Widget _buildBody(
+      BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+    if (snapshot.hasError) {
+      return _buildError(context);
+    } else if (snapshot.hasData) {
+      return _buildList(context, snapshot.data!);
+    } else {
+      return _buildLoading(context);
+    }
+  }
+
+  Widget _buildLoading(BuildContext context) => Center(
+        child: CircularProgressIndicator(),
+      );
+
+  Widget _buildError(BuildContext context) => Container(
+        alignment: Alignment.center,
+        padding: EdgeInsets.all(16),
+        child: Text(
+          "Si è verificato un errore",
+          textAlign: TextAlign.center,
+        ),
+      );
+
+  Widget _buildList(BuildContext context, QuerySnapshot snapshot) {
+    return ListView.builder(
+      itemCount: snapshot.size,
+      itemBuilder: (context, index) {
+        final doc = snapshot.docs[index];
+        final post = ModelPost(
+          id: doc.id,
+          date: doc.get("date").toDate(),
+          authorId: doc.get("authorId"),
+          authorName: doc.get("authorName"),
+          authorImageUrl: doc.get("authorImageUrl"),
+          content: doc.get("content"),
+          imageUrl: doc.get("imageUrl"),
         );
-      } else {
-        return ListView.builder(
-          itemCount: snapshot.data?.size ?? 0,
-          itemBuilder: (context, index) => Card(
-            child: Text("POST"),
-          ),
-        );
-      }
-    },
-  );
-      // ListView.builder(
-      //   padding: const EdgeInsets.all(16),
-      //   //TODO itemCount: _mockPosts.length,
-      //   itemBuilder: _buildPostCard,
-      // );
+        return _buildPostCard(context, post);
+      },
+      padding: EdgeInsets.all(16),
+    );
+  }
 
   Widget _buildPostCard(BuildContext context, ModelPost post) {
     return Padding(
@@ -97,22 +115,16 @@ class Home extends StatelessWidget {
                       width: 56,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Theme
-                            .of(context)
-                            .unselectedWidgetColor,
+                        color: Theme.of(context).unselectedWidgetColor,
                         image: DecorationImage(
                           image: NetworkImage(post.authorImageUrl ?? ""),
                         ),
                       ),
-                      //child: Image.network(post.user?.imageUrl ?? ""),
                     ),
                     SizedBox(width: 16),
                     Text(
                       post.authorName ?? "Utente Anonimo",
-                      style: Theme
-                          .of(context)
-                          .textTheme
-                          .bodyText1,
+                      style: Theme.of(context).textTheme.bodyText1,
                     ),
                   ],
                 ),
@@ -120,11 +132,8 @@ class Home extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  post.content!,
-                  style: Theme
-                      .of(context)
-                      .textTheme
-                      .bodyText2,
+                  post.content ?? "",
+                  style: Theme.of(context).textTheme.bodyText2,
                 ),
               ),
               Padding(
@@ -132,10 +141,7 @@ class Home extends StatelessWidget {
                 child: Text(
                   _dateFormat.format(post.date),
                   textAlign: TextAlign.end,
-                  style: Theme
-                      .of(context)
-                      .textTheme
-                      .caption,
+                  style: Theme.of(context).textTheme.caption,
                 ),
               ),
             ],
@@ -145,10 +151,15 @@ class Home extends StatelessWidget {
     );
   }
 
+  Widget _buildFab(BuildContext context) => FloatingActionButton(
+        onPressed: _onFabPressed,
+        child: Icon(Icons.add),
+      );
+
   void _onMenuAction(BuildContext context, MenuItemAction action) {
     switch (action) {
       case MenuItemAction.settings:
-      //TODO
+        //TODO
         break;
       case MenuItemAction.logout:
         _logout(context);
@@ -156,9 +167,15 @@ class Home extends StatelessWidget {
     }
   }
 
+  void _onFabPressed() {
+    //TODO: aprire la schermata di creazione del post
+  }
+
   void _logout(BuildContext context) async {
     final confirm = await showDialog<bool>(
-      context: context, builder: _buildLogoutDialog,);
+      context: context,
+      builder: _buildLogoutDialog,
+    );
 
     if (confirm != true) return;
 
@@ -172,17 +189,17 @@ class Home extends StatelessWidget {
   }
 
   Widget _buildLogoutDialog(BuildContext context) => AlertDialog(
-    title: Text("Logout"),
-    content: Text("Are you sure?"),
-    actions: [
-      TextButton(
-        child: Text("Cancel"),
-        onPressed: () => Navigator.of(context).pop(false),
-      ),
-      TextButton(
-        child: Text("Logout"),
-        onPressed: () => Navigator.of(context).pop(true),
-      ),
-    ],
-  );
+        title: Text("Logout"),
+        content: Text("Are you sure?"),
+        actions: [
+          TextButton(
+            child: Text("Cancel"),
+            onPressed: () => Navigator.of(context).pop(false),
+          ),
+          TextButton(
+            child: Text("Logout"),
+            onPressed: () => Navigator.of(context).pop(true),
+          ),
+        ],
+      );
 }
