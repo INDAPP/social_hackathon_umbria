@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:social_hackathon_umbria/login.dart';
 import 'package:social_hackathon_umbria/model_post.dart';
+import 'package:social_hackathon_umbria/new_post.dart';
 
 enum MenuItemAction {
   logout,
@@ -32,7 +33,10 @@ class Home extends StatelessWidget {
         actions: [
           PopupMenuButton<MenuItemAction>(
             itemBuilder: _buildMenu,
-            icon: Icon(Icons.more_vert),
+            icon: Icon(
+              Icons.more_vert,
+              color: Theme.of(context).appBarTheme.foregroundColor,
+            ),
             onSelected: (action) => _onMenuAction(context, action),
           ),
         ],
@@ -152,7 +156,7 @@ class Home extends StatelessWidget {
   }
 
   Widget _buildFab(BuildContext context) => FloatingActionButton(
-        onPressed: _onFabPressed,
+        onPressed: () => _onFabPressed(context),
         child: Icon(Icons.add),
       );
 
@@ -167,8 +171,13 @@ class Home extends StatelessWidget {
     }
   }
 
-  void _onFabPressed() {
-    //TODO: aprire la schermata di creazione del post
+  void _onFabPressed(BuildContext context) {
+    final navigator = Navigator.of(context);
+    final route = MaterialPageRoute(
+      builder: (context) => NewPost(),
+    );
+    //TODO: gestire il risultato restituito dalla schermata.
+    navigator.push(route);
   }
 
   void _logout(BuildContext context) async {
