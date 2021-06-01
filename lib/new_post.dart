@@ -8,6 +8,8 @@ class NewPost extends StatefulWidget {
 }
 
 class _NewPostState extends State<NewPost> {
+  String _text = "";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,6 +30,8 @@ class _NewPostState extends State<NewPost> {
                   hintText: "Scrivi qui il tuo post...",
                   //TODO: (forse) Randomizza il testo suggerito
                 ),
+                onChanged: _onTextChanged,
+
               ),
             ),
           ),
@@ -51,7 +55,7 @@ class _NewPostState extends State<NewPost> {
                 ),
                 Expanded(
                   child: TextButton(
-                    onPressed: (){},
+                    onPressed: _text.isEmpty ? null : (){},
                     child: Text("Pubblica"),
                   ),
                 ),
@@ -61,5 +65,10 @@ class _NewPostState extends State<NewPost> {
         ],
       ),
     );
+  }
+  void _onTextChanged (String text){
+   setState(() {
+     _text = text;
+   });
   }
 }
