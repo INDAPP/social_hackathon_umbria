@@ -171,13 +171,23 @@ class Home extends StatelessWidget {
     }
   }
 
-  void _onFabPressed(BuildContext context) {
+  void _onFabPressed(BuildContext context) async {
     final navigator = Navigator.of(context);
-    final route = MaterialPageRoute(
+    final route = MaterialPageRoute<String>(
       builder: (context) => NewPost(),
     );
-    //TODO: gestire il risultato restituito dalla schermata.
-    navigator.push(route);
+    final text = await navigator.push<String>(route);
+    final user = FirebaseAuth.instance.currentUser;
+    if (text != null && user != null) {
+      await collection.add({
+        "date": FieldValue.serverTimestamp(),
+        "authorId": user.uid,
+        "authorName": user.displayName,
+        "authorImageUrl": user.photoURL,
+        "content": text,
+        "imageUrl": null,
+      });
+    }
   }
 
   void _logout(BuildContext context) async {

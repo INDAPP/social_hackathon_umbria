@@ -46,7 +46,7 @@ class _NewPostState extends State<NewPost> {
               children: [
                 Expanded(
                   child: TextButton(
-                    onPressed: (){},
+                    onPressed: _onCancel,
                     child: Text("Annulla"),
                   ),
                 ),
@@ -55,7 +55,7 @@ class _NewPostState extends State<NewPost> {
                 ),
                 Expanded(
                   child: TextButton(
-                    onPressed: _text.isEmpty ? null : (){},
+                    onPressed: _text.isEmpty ? null : _onPublish,
                     child: Text("Pubblica"),
                   ),
                 ),
@@ -70,5 +70,15 @@ class _NewPostState extends State<NewPost> {
    setState(() {
      _text = text;
    });
+  }
+
+  void _onCancel() {
+    final navigator = Navigator.of(context);
+    navigator.pop();
+  }
+
+  void _onPublish() {
+    final navigator = Navigator.of(context);
+    navigator.pop(_text);
   }
 }
