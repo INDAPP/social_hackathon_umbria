@@ -18,11 +18,11 @@ class App extends StatelessWidget {
     primaryColor: Colors.blue,
     accentColor: Colors.amber,
     scaffoldBackgroundColor: Color(0xffdfe0e1),
-    appBarTheme: AppBarTheme(
-      brightness: Brightness.light,
+    /*appBarTheme: AppBarTheme(
+      brightness: Brightness.dark,
       color: Colors.white,
       foregroundColor: Colors.black,
-    ),
+    ),*/
     elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           primary: Color(0xff00b6ca),
