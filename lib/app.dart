@@ -14,15 +14,16 @@ class App extends StatelessWidget {
 
   ThemeData _createTheme() => ThemeData(
     brightness: Brightness.light,
-    primarySwatch: Colors.red,
+    primaryColorBrightness: Brightness.light,
+    accentColorBrightness: Brightness.light,
+    primarySwatch: Colors.grey,
     primaryColor: Colors.blue,
     accentColor: Colors.amber,
     scaffoldBackgroundColor: Color(0xffdfe0e1),
-    /*appBarTheme: AppBarTheme(
+    appBarTheme: AppBarTheme(
       brightness: Brightness.dark,
       color: Colors.white,
-      foregroundColor: Colors.black,
-    ),*/
+    ),
     elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           primary: Color(0xff00b6ca),

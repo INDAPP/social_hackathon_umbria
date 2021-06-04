@@ -70,6 +70,7 @@ class _NewPostState extends State<NewPost> {
                   //TODO: (forse) Randomizza il testo suggerito
                 ),
                 onChanged: _onTextChanged,
+                autofocus: true,
               ),
             ),
           ),
