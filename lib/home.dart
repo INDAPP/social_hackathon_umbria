@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:social_hackathon_umbria/login.dart';
 import 'package:social_hackathon_umbria/model_post.dart';
 import 'package:social_hackathon_umbria/new_post.dart';
+import 'package:social_hackathon_umbria/settings.dart';
 
 enum MenuItemAction {
   logout,
@@ -163,7 +164,7 @@ class Home extends StatelessWidget {
   void _onMenuAction(BuildContext context, MenuItemAction action) {
     switch (action) {
       case MenuItemAction.settings:
-        //TODO
+        _settings(context);
         break;
       case MenuItemAction.logout:
         _logout(context);
@@ -188,6 +189,14 @@ class Home extends StatelessWidget {
         "imageUrl": null,
       });
     }
+  }
+
+  void _settings(BuildContext context) {
+    final navigator = Navigator.of(context);
+    final route = MaterialPageRoute(
+      builder: (context) => SettingsScreen(),
+    );
+    navigator.push(route);
   }
 
   void _logout(BuildContext context) async {
