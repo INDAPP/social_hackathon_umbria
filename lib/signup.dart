@@ -51,7 +51,7 @@ class _SignupState extends State<Signup> {
                 _name = value;
               },
               decoration: InputDecoration(
-                labelText: "Nome",
+                labelText: "Name",
               ),
             ),
             TextFormField(
@@ -81,7 +81,7 @@ class _SignupState extends State<Signup> {
             TextFormField(
               validator: _validateConfirmPassword,
               decoration: InputDecoration(
-                labelText: "Conferma Password",
+                labelText: "Confirm Password",
               ),
               obscureText: true,
             ),
@@ -96,14 +96,14 @@ class _SignupState extends State<Signup> {
     if (length >= 3)
       return null;
     else
-      return "Inserire almeno 3 caratteri";
+      return "Enter at least 3 characters";
   }
 
   String? _validateEmail([String? email]) {
     if (email?.contains("@") == true)
       return null;
     else
-      return "Inserire un'email valida";
+      return "Enter a valid email";
   }
 
   String? _validatePassword([String? password]) {
@@ -111,14 +111,14 @@ class _SignupState extends State<Signup> {
     if (length >= 6)
       return null;
     else
-      return "Inserire almeno 6 caratteri";
+      return "Enter at least 6 characters";
   }
 
   String? _validateConfirmPassword([String? confirmPassword]) {
     if (_password == confirmPassword)
       return null;
     else
-      return "Le password non corrispondono";
+      return "Passwords do not match";
   }
 
   void _dismiss() {

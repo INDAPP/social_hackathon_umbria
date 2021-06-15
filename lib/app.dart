@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social_hackathon_umbria/home.dart';
 import 'package:social_hackathon_umbria/login.dart';
-import 'package:social_hackathon_umbria/new_post.dart';
 
 class App extends StatelessWidget {
   @override

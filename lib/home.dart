@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:social_hackathon_umbria/login.dart';
+import 'package:social_hackathon_umbria/model_new_post.dart';
 import 'package:social_hackathon_umbria/model_post.dart';
 import 'package:social_hackathon_umbria/new_post.dart';
 import 'package:social_hackathon_umbria/settings.dart';
@@ -19,8 +21,8 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: _buildAppBar(context),
-        body: StreamBuilder<QuerySnapshot>(
-          stream: collection.snapshots(),
+        body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+          stream: collection.orderBy('date', descending: true).snapshots(),
           builder: _buildBody,
         ),
         floatingActionButton: _buildFab(context),
@@ -54,8 +56,8 @@ class Home extends StatelessWidget {
         ),
       ];
 
-  Widget _buildBody(
-      BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+  Widget _buildBody(BuildContext context,
+      AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
     if (snapshot.hasError) {
       return _buildError(context);
     } else if (snapshot.hasData) {
@@ -78,23 +80,25 @@ class Home extends StatelessWidget {
         ),
       );
 
-  Widget _buildList(BuildContext context, QuerySnapshot snapshot) {
+  Widget _buildList(
+      BuildContext context, QuerySnapshot<Map<String, dynamic>> snapshot) {
     return ListView.builder(
       itemCount: snapshot.size,
       itemBuilder: (context, index) {
         final doc = snapshot.docs[index];
         final post = ModelPost(
           id: doc.id,
-          date: doc.get("date").toDate(),
+          date: doc.get("date")?.toDate() ?? DateTime.now(),
           authorId: doc.get("authorId"),
           authorName: doc.get("authorName"),
           authorImageUrl: doc.get("authorImageUrl"),
           content: doc.get("content"),
           imageUrl: doc.get("imageUrl"),
+          likes: doc.data()["likes"]?.cast<String>(),
         );
         return _buildPostCard(context, post);
       },
-      padding: EdgeInsets.all(16),
+      padding: EdgeInsets.all(16).add(EdgeInsets.only(bottom: 92)),
     );
   }
 
@@ -121,19 +125,37 @@ class Home extends StatelessWidget {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Theme.of(context).unselectedWidgetColor,
-                        image: DecorationImage(
-                          image: NetworkImage(post.authorImageUrl ?? ""),
-                        ),
+                        image: post.authorImageUrl != null
+                            ? DecorationImage(
+                                image: NetworkImage(post.authorImageUrl ?? ""),
+                              )
+                            : null,
                       ),
+                      child: post.authorImageUrl == null
+                          ? Icon(
+                              Icons.person,
+                              size: 48,
+                              color: Colors.white,
+                            )
+                          : null,
                     ),
                     SizedBox(width: 16),
-                    Text(
-                      post.authorName ?? "Utente Anonimo",
-                      style: Theme.of(context).textTheme.bodyText1,
+                    Expanded(
+                      child: Text(
+                        post.authorName ?? "Utente Anonimo",
+                        style: Theme.of(context).textTheme.bodyText1,
+                        maxLines: 2,
+                      ),
                     ),
+                    if (FirebaseAuth.instance.currentUser?.uid == post.authorId)
+                      IconButton(
+                        onPressed: () => _onPostDeletePressed(context, post),
+                        icon: Icon(Icons.delete_outline),
+                      ),
                   ],
                 ),
               ),
+              if (post.imageUrl != null) Image.network(post.imageUrl!),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
@@ -143,10 +165,27 @@ class Home extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  _dateFormat.format(post.date),
-                  textAlign: TextAlign.end,
-                  style: Theme.of(context).textTheme.caption,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton.icon(
+                      onPressed: () => _onPostLikePressed(context, post),
+                      icon: Icon(post.likes?.contains(
+                                  FirebaseAuth.instance.currentUser?.uid) ==
+                              true
+                          ? Icons.favorite
+                          : Icons.favorite_border),
+                      label: Text((post.likes?.length ?? 0).toString()),
+                      style: TextButton.styleFrom(
+                        primary: Color(0xFFEF7876),
+                      ),
+                    ),
+                    Text(
+                      _dateFormat.format(post.date),
+                      textAlign: TextAlign.end,
+                      style: Theme.of(context).textTheme.caption,
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -159,6 +198,36 @@ class Home extends StatelessWidget {
   Widget _buildFab(BuildContext context) => FloatingActionButton(
         onPressed: () => _onFabPressed(context),
         child: Icon(Icons.add),
+      );
+
+  Widget _buildLogoutDialog(BuildContext context) => AlertDialog(
+        title: Text("Logout"),
+        content: Text("Are you sure?"),
+        actions: [
+          TextButton(
+            child: Text("Cancel"),
+            onPressed: () => Navigator.of(context).pop(false),
+          ),
+          TextButton(
+            child: Text("Logout"),
+            onPressed: () => Navigator.of(context).pop(true),
+          ),
+        ],
+      );
+
+  Widget _buildDeleteConfirmDialog(BuildContext context) => AlertDialog(
+        title: Text("Delete Post"),
+        content: Text("Are you sure?"),
+        actions: [
+          TextButton(
+            child: Text("Cancel"),
+            onPressed: () => Navigator.of(context).pop(false),
+          ),
+          TextButton(
+            child: Text("Delete"),
+            onPressed: () => Navigator.of(context).pop(true),
+          ),
+        ],
       );
 
   void _onMenuAction(BuildContext context, MenuItemAction action) {
@@ -174,19 +243,54 @@ class Home extends StatelessWidget {
 
   void _onFabPressed(BuildContext context) async {
     final navigator = Navigator.of(context);
-    final route = MaterialPageRoute<String>(
+    final route = MaterialPageRoute<ModelNewPost>(
       builder: (context) => NewPost(),
     );
-    final text = await navigator.push<String>(route);
+    final post = await navigator.push<ModelNewPost>(route);
     final user = FirebaseAuth.instance.currentUser;
-    if (text != null && user != null) {
+    if (post != null && user != null) {
+      final imageFile = post.imageFile;
+      String? imageUrl;
+      if (imageFile != null) {
+        final now = DateTime.now();
+        final ref = FirebaseStorage.instance.ref('posts/$now');
+        await ref.putFile(imageFile);
+        imageUrl = await ref.getDownloadURL();
+      }
       await collection.add({
         "date": FieldValue.serverTimestamp(),
         "authorId": user.uid,
         "authorName": user.displayName,
         "authorImageUrl": user.photoURL,
-        "content": text,
-        "imageUrl": null,
+        "content": post.text,
+        "imageUrl": imageUrl,
+      });
+    }
+  }
+
+  void _onPostDeletePressed(BuildContext context, ModelPost post) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: _buildDeleteConfirmDialog,
+    );
+
+    if (confirm != true) return;
+
+    await collection.doc(post.id).delete();
+  }
+
+  void _onPostLikePressed(BuildContext context, ModelPost post) async {
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    final ref = collection.doc(post.id);
+    if (post.likes?.contains(currentUserId) == true) {
+      /// Tolgo il like
+      await ref.update({
+        'likes': FieldValue.arrayRemove([currentUserId]),
+      });
+    } else {
+      /// Metto il like
+      await ref.update({
+        'likes': FieldValue.arrayUnion([currentUserId]),
       });
     }
   }
@@ -215,19 +319,4 @@ class Home extends StatelessWidget {
     );
     navigator.pushReplacement(route);
   }
-
-  Widget _buildLogoutDialog(BuildContext context) => AlertDialog(
-        title: Text("Logout"),
-        content: Text("Are you sure?"),
-        actions: [
-          TextButton(
-            child: Text("Cancel"),
-            onPressed: () => Navigator.of(context).pop(false),
-          ),
-          TextButton(
-            child: Text("Logout"),
-            onPressed: () => Navigator.of(context).pop(true),
-          ),
-        ],
-      );
 }

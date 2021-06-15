@@ -118,7 +118,7 @@ class _LoginState extends State<Login> {
     if (email?.contains("@") == true)
       return null;
     else
-      return "Inserire un'email valida";
+      return "Enter a valid email";
   }
 
   String? _validatePassword([String? password]) {
@@ -126,7 +126,7 @@ class _LoginState extends State<Login> {
     if (length >= 6)
       return null;
     else
-      return "Inserire almeno 6 caratteri";
+      return "Enter at least 6 characters";
   }
 
   void _login() {

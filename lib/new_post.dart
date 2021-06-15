@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:social_hackathon_umbria/model_new_post.dart';
 
 class NewPost extends StatefulWidget {
   @override
@@ -25,7 +26,7 @@ class _NewPostState extends State<NewPost> {
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
-      title: Text("Nuovo Post"),
+      title: Text("New Post"),
       actions: [
         IconButton(
           icon: Icon(Icons.add_a_photo_outlined),
@@ -56,7 +57,7 @@ class _NewPostState extends State<NewPost> {
                 alignment: Alignment.centerLeft,
                 child: TextButton(
                   onPressed: _removePicture,
-                  child: Text("Rimuovi"),
+                  child: Text("Remove Image"),
                 ),
               ),
             ),
@@ -66,7 +67,7 @@ class _NewPostState extends State<NewPost> {
               child: TextField(
                 maxLines: null,
                 decoration: InputDecoration.collapsed(
-                  hintText: "Scrivi qui il tuo post...",
+                  hintText: "Write your post here...",
                   //TODO: (forse) Randomizza il testo suggerito
                 ),
                 onChanged: _onTextChanged,
@@ -86,7 +87,7 @@ class _NewPostState extends State<NewPost> {
                 Expanded(
                   child: TextButton(
                     onPressed: _onCancel,
-                    child: Text("Annulla"),
+                    child: Text("Cancel"),
                   ),
                 ),
                 VerticalDivider(
@@ -95,7 +96,7 @@ class _NewPostState extends State<NewPost> {
                 Expanded(
                   child: TextButton(
                     onPressed: _text.isEmpty ? null : _onPublish,
-                    child: Text("Pubblica"),
+                    child: Text("Publish"),
                   ),
                 ),
               ],
@@ -145,6 +146,10 @@ class _NewPostState extends State<NewPost> {
 
   void _onPublish() {
     final navigator = Navigator.of(context);
-    navigator.pop(_text);
+    final newPost = ModelNewPost(
+      text: _text,
+      imageFile: _image,
+    );
+    navigator.pop(newPost);
   }
 }

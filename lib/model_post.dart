@@ -1,4 +1,3 @@
-import 'package:social_hackathon_umbria/model_user.dart';
 
 class ModelPost {
   final String id;
@@ -8,6 +7,7 @@ class ModelPost {
   final String? authorImageUrl;
   final String? content;
   final String? imageUrl;
+  final List<String>? likes;
 
   const ModelPost({
     required this.id,
@@ -17,5 +17,6 @@ class ModelPost {
     this.authorImageUrl,
     this.content,
     this.imageUrl,
+    this.likes,
   });
 }
