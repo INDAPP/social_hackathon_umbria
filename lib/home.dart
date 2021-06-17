@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:social_hackathon_umbria/fullscreen_image.dart';
 import 'package:social_hackathon_umbria/login.dart';
 import 'package:social_hackathon_umbria/model_new_post.dart';
 import 'package:social_hackathon_umbria/model_post.dart';
@@ -155,7 +156,14 @@ class Home extends StatelessWidget {
                   ],
                 ),
               ),
-              if (post.imageUrl != null) Image.network(post.imageUrl!),
+              if (post.imageUrl != null)
+                InkWell(
+                  child: Hero(
+                    tag: post.imageUrl!,
+                    child: Image.network(post.imageUrl!),
+                  ),
+                  onTap: () => _showImage(context, post.imageUrl!),
+                ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
@@ -318,5 +326,13 @@ class Home extends StatelessWidget {
       builder: (context) => Login(),
     );
     navigator.pushReplacement(route);
+  }
+
+  void _showImage(BuildContext context, String imageUrl) {
+    final navigator = Navigator.of(context);
+    final route = MaterialPageRoute(
+      builder: (context) => FullscreenImage(imageUrl: imageUrl),
+    );
+    navigator.push(route);
   }
 }
