@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="info.socialhackathonumbria.social_hackathon_umbria">
+    <uses-permission android:name="android.permission.INTERNET"/>
    <application
         android:name="androidx.multidex.MultiDexApplication"
         android:label="SHU"
